@@ -7,10 +7,11 @@
         <script src="static/jquery.js"></script>
         <script>
 			//var cheerUp = ['Ну, ээээ... Не вешай нос!', ''];
-			function clearTask() {
+			function clearTask(userMode) {
 				$.ajax({
 					url: '/task',
 					method: 'GET',
+					data: {'mode': userMode},
 					success: function(response) {
 						new_task = $.parseJSON(response);
 						$('#quiz').hide();
@@ -22,14 +23,20 @@
 						}).removeClass();
 						$('#quiz #question').text(new_task.task);
 						if (Math.random() < 0.5) {
-							$('#quiz #left').text(new_task.formal);
-							$('#quiz #right').text(new_task.informal);
+							$('#quiz #left').text(new_task.correct);
+							$('#quiz #right').text(new_task.incorrect);
 							correct = 'left';
 						} else {
-							$('#quiz #left').text(new_task.informal);
-							$('#quiz #right').text(new_task.formal);
+							$('#quiz #left').text(new_task.incorrect);
+							$('#quiz #right').text(new_task.correct);
 							correct = 'right';
 						}
+						/*marginCard = $('#quiz').height() - $('#question').height() - $('#left').height() - 80 - 30 - 30;
+						marginCard /= 2;
+						alert(marginCard);
+						$('#question').css({
+							'marginTop': marginCard
+						});*/
 						$('#quiz').fadeIn(500);
 					}
 				});
@@ -56,16 +63,14 @@
                     }, 400);
                 });
                 
-                var userMode = 0;
+                var userMode = 'formal';
                 $('.mode').click(function(){
-                    if ($(this).text() == 'ЛЕГКО') {
-                        userMode = 1;
-                    } else if ($(this).text() == 'СРЕДНЕ') {
-                        userMode = 2;
+                    if ($(this).text() == 'ИНТЕРНЕТ-СЛЕНГ') {
+                        userMode = 'slang';
                     } else {
-                        userMode = 3;
+                        userMode = 'formal';
                     }
-                    
+					
                     $(this).addClass('animStart');
                     setTimeout(function(){
                         $('#modeLevel').animate({'marginLeft': -1000}, 500);
@@ -74,7 +79,7 @@
                         $('#quote').animate({'marginLeft': -1000}, 550);
                         setTimeout(function(){
                             $('#modeMenu').hide();
-							clearTask();
+							clearTask(userMode);
                             $('#progressBar').fadeIn(500);
                         }, 550);
                     }, 400);
@@ -119,7 +124,7 @@
 						setTimeout(function(){
 							//если еще есть вопросы
 							if (question_number < 10) {
-								clearTask();
+								clearTask(userMode);
 							} else {
 								$('#quiz').hide();
 								$('#progressBar').hide();

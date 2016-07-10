@@ -128,9 +128,10 @@ h1{
 
 #question{
 	font-family: robotoThin;
-	font-size: 70px;
+	font-size: 45px;
 	text-align: center;
-	margin-top: 130px;
+	margin: 130px auto 0 auto;
+	width: 80%;
 }
 
 #quiz a {
