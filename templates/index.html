@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Formal VS Informal</title>
+        <link rel="stylesheet" href="static/style.css" type="text/css" />
+        <script src="static/jquery.js"></script>
+        <script>
+			//var cheerUp = ['Ну, ээээ... Не вешай нос!', ''];
+			function clearTask() {
+				$.ajax({
+					url: '/task',
+					method: 'GET',
+					success: function(response) {
+						new_task = $.parseJSON(response);
+						$('#quiz').hide();
+						$('#quiz').removeClass();
+						$('#quiz a').css({
+							'outline': '8px solid #656565',
+							'backgroundColor': '#fff',
+							'color': '#000'
+						}).removeClass();
+						$('#quiz #question').text(new_task.task);
+						if (Math.random() < 0.5) {
+							$('#quiz #left').text(new_task.formal);
+							$('#quiz #right').text(new_task.informal);
+							correct = 'left';
+						} else {
+							$('#quiz #left').text(new_task.informal);
+							$('#quiz #right').text(new_task.formal);
+							correct = 'right';
+						}
+						$('#quiz').fadeIn(500);
+					}
+				});
+			}
+            $(function(){
+                
+                wrapperTop = ($(window).height() - $('#wrapper').height()) / 2;
+                $('#wrapper').css('marginTop', wrapperTop);
+                $('#modeMenu').hide();
+				$('#quiz').hide();
+				$('#progressBar').hide();
+				$('#final').hide();
+                
+                $('#start').click(function(){
+                    $(this).addClass('animStart');
+                    setTimeout(function(){
+                        $('#welcome').animate({'marginLeft': -1000}, 500);
+                        $('#description').animate({'marginLeft': -1000}, 600);
+                        $('#start').animate({'marginLeft': -1000}, 450);
+                        setTimeout(function(){
+                            $('#startMenu').hide();
+                            $('#modeMenu').fadeIn(500);
+                        }, 600);
+                    }, 400);
+                });
+                
+                var userMode = 0;
+                $('.mode').click(function(){
+                    if ($(this).text() == 'ЛЕГКО') {
+                        userMode = 1;
+                    } else if ($(this).text() == 'СРЕДНЕ') {
+                        userMode = 2;
+                    } else {
+                        userMode = 3;
+                    }
+                    
+                    $(this).addClass('animStart');
+                    setTimeout(function(){
+                        $('#modeLevel').animate({'marginLeft': -1000}, 500);
+                        $('.mode:eq(0)').animate({'marginLeft': -1000}, 450);
+                        $('.mode:eq(1)').animate({'marginLeft': -1000}, 350);
+                        $('#quote').animate({'marginLeft': -1000}, 550);
+                        setTimeout(function(){
+                            $('#modeMenu').hide();
+							clearTask();
+                            $('#progressBar').fadeIn(500);
+                        }, 550);
+                    }, 400);
+                });
+				
+				
+				
+				$('#quiz a').hover(function () {
+					$(this).removeClass('quizMouseOut').addClass('quizHover').css('outlineColor', '#000');
+				}, function () {
+					$(this).removeClass('quizHover').addClass('quizMouseOut').css('outlineColor', '#656565');
+				});
+				
+				correct = 'right';
+				question_number = 0;
+				points = 0;
+				
+				$('#quiz a').click(function () {
+					++question_number;
+					if ($(this).attr('id') == correct) {
+						$(this).addClass('correct').css({
+							'outline': 'none',
+							'backgroundColor': '#8bc34a',
+							'color': '#fff'
+						});
+						++points;
+					} else {
+						$(this).addClass('wrong').css({
+							'outline': 'none',
+							'backgroundColor': '#c62828',
+							'color': '#fff'
+						});
+					}
+					setTimeout(function() {
+						if (Math.random() < 0.5)
+							$('#quiz').addClass('cardFallLeft');
+						else
+							$('#quiz').addClass('cardFallRight');
+						$('#progressBar').animate({
+							'left': -950 + question_number * 95
+						}, 700);
+						setTimeout(function(){
+							//если еще есть вопросы
+							if (question_number < 10) {
+								clearTask();
+							} else {
+								$('#quiz').hide();
+								$('#progressBar').hide();
+								$('#result span').text(points);
+								$('#final').fadeIn(500);
+							}
+						}, 700);
+					}, 500);
+				});
+				
+				$('#reset').click(function() {
+					$(this).addClass('animStart');
+					setTimeout(function(){
+                        $('#quiz').fadeOut(550);
+						setTimeout(function() {
+							$('#modeMenu *').css({
+								'marginLeft': 'auto'
+							});
+							$('.mode, #reset').removeClass('animStart');
+							//alert($('#reset').text());
+							$('#final').hide();
+							question_number = 0;
+							points = 0;
+							$('#modeMenu, #quiz').fadeIn(500);
+							$('#progressBar').css({
+								'left': -950
+							});
+						}, 550);
+                    }, 400);
+				});
+				
+				//$('#startMenu, #modeMenu, #quiz').hide();
+            });
+        </script>
+    </head>
+    <body>
+        <div id = "wrapper">
+            <div id = "startMenu">
+                <h1 id = "welcome">Welcome!</h1>
+                <div id = "description">
+                    FORMAL VS. INFORMAL — сайт, который поможет тебе понять разницу между формальным и неформальным английским. Отвечай на вопросы викторины и узнавай уже известные тебе слова по-новому. <br /> Удачи!
+                </div>
+                <a href = "#" id = "start">НАЧАТЬ ТРЕНИРОВКУ</a>
+            </div>
+            <div id = "modeMenu">
+                <h1 id = "modeLevel">Выберите категорию</h1>
+                <a href = "#" class = "mode">ИНТЕРНЕТ-СЛЕНГ</a>
+                <a href = "#" class = "mode">ФОРМАЛЬНАЯ ЛЕКСИКА</a>
+				<div id = "quote">
+					The limits of my language are the limits of my world. <br />
+					<span>Ludwig Wittgenstein</span>
+				</div>
+            </div>
+            <div id = "quiz">
+                <div id = "question">
+                    возрасти1
+                </div>
+                <a href = "#" id = "left">go up</a>
+                <a href = "#" id = "right">increase</a>
+            </div>
+			<div id = "progressBar">
+			
+			</div>
+			<div id = "final">
+				<div id = "result">
+					<span>9</span>/10
+				</div>
+				<div id = "cheerUp">
+					А вы не так уж и плохи!
+				</div>
+				<div id = "cheerUpDescription">
+					И ведь на самом деле, 9 из 10 - очень крутой результат. Распечатайте и повесьте на стену.
+				</div>
+				<a href = "#" id = "reset">НАЧАТЬ ЗАНОВО</a>
+			</div>
+        </div>
+    </body>
+</html>
